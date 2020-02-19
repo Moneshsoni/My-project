@@ -1,117 +1,82 @@
-# My-project tic tac toe game from tkinter import *
-from tkinter import messagebox
-tk = Tk()
-tk.title("Tic Tac Toe")
+# Face detection Tutorial
+OpenCV
+OpenCV is the most popular library for computer vision. Originally written in C/C++, it now provides bindings for Python.
 
-pa = StringVar()
-playerb = StringVar()
-p1 = StringVar()
-p2 = StringVar()
+OpenCV uses machine learning algorithms to search for faces within a picture. Because faces are so complicated, there isn’t one simple test that will tell you if it found a face or not. Instead, there are thousands of small patterns and features that must be matched. The algorithms break the task of identifying the face into thousands of smaller, bite-sized tasks, each of which is easy to solve. These tasks are also called classifiers.
 
-player1_name = Entry(tk, textvariable=p1, bd=5)
-player1_name.grid(row=1, column=1, columnspan=8)
-player2_name = Entry(tk, textvariable=p2, bd=5)
-player2_name.grid(row=2, column=1, columnspan=8)
+For something like a face, you might have 6,000 or more classifiers, all of which must match for a face to be detected (within error limits, of course). But therein lies the problem: for face detection, the algorithm starts at the top left of a picture and moves down across small blocks of data, looking at each block, constantly asking, “Is this a face? … Is this a face? … Is this a face?” Since there are 6,000 or more tests per block, you might have millions of calculations to do, which will grind your computer to a halt.
 
-bclick = True
-flag = 0
+To get around this, OpenCV uses cascades. What’s a cascade? The best answer can be found in the dictionary: “a waterfall or series of waterfalls.”
 
-def disableButton():
-    button1.configure(state=DISABLED)
-    button2.configure(state=DISABLED)
-    button3.configure(state=DISABLED)
-    button4.configure(state=DISABLED)
-    button5.configure(state=DISABLED)
-    button6.configure(state=DISABLED)
-    button7.configure(state=DISABLED)
-    button8.configure(state=DISABLED)
-    button9.configure(state=DISABLED)
+Like a series of waterfalls, the OpenCV cascade breaks the problem of detecting faces into multiple stages. For each block, it does a very rough and quick test. If that passes, it does a slightly more detailed test, and so on. The algorithm may have 30 to 50 of these stages or cascades, and it will only detect a face if all stages pass.
 
+The advantage is that the majority of the picture will return a negative during the first few stages, which means the algorithm won’t waste time testing all 6,000 features on it. Instead of taking hours, face detection can now be done in real time.
 
+Cascades in Practice
+Though the theory may sound complicated, in practice it is quite easy. The cascades themselves are just a bunch of XML files that contain OpenCV data used to detect objects. You initialize your code with the cascade you want, and then it does the work for you.
 
-def btnClick(buttons):
-    global bclick, flag, player2_name, player1_name, playerb, pa
-    if buttons["text"] == " " and bclick == True:
-        buttons["text"] = "X"
-        bclick = False
-        playerb = p2.get() + " Wins!"
-        pa = p1.get() + " Wins!"
-        checkForWin()
-        flag += 1
+Since face detection is such a common case, OpenCV comes with a number of built-in cascades for detecting everything from faces to eyes to hands to legs. There are even cascades for non-human things. For example, if you run a banana shop and want to track people stealing bananas, this guy has built one for that!
 
+Installing OpenCV
+First, you need to find the correct setup file for your operating system.
 
-    elif buttons["text"] == " " and bclick == False:
-        buttons["text"] = "O"
-        bclick = True
-        checkForWin()
-        flag += 1
-    else:
-        tkinter.messagebox.showinfo("Tic-Tac-Toe", "Button already Clicked!")
+I found that installing OpenCV was the hardest part of the task. If you get strange unexplainable errors, it could be due to library clashes, 32/64 bit differences, and so on. I found it easiest to just use a Linux virtual machine and install OpenCV from scratch.
 
-def checkForWin():
-    if (button1['text'] == 'X' and button2['text'] == 'X' and button3['text'] == 'X' or
-        button4['text'] == 'X' and button5['text'] == 'X' and button6['text'] == 'X' or
-        button7['text'] =='X' and button8['text'] == 'X' and button9['text'] == 'X' or
-        button1['text'] == 'X' and button5['text'] == 'X' and button9['text'] == 'X' or
-        button3['text'] == 'X' and button5['text'] == 'X' and button7['text'] == 'X' or
-        button1['text'] == 'X' and button2['text'] == 'X' and button3['text'] == 'X' or
-        button1['text'] == 'X' and button4['text'] == 'X' and button7['text'] == 'X' or
-        button2['text'] == 'X' and button5['text'] == 'X' and button8['text'] == 'X' or
-        button7['text'] == 'X' and button6['text'] == 'X' and button9['text'] == 'X'):
-        disableButton()
-        tkinter.messagebox.showinfo("Tic-Tac-Toe"," Player 1 Won")
-       
+Once you have completed the installation, you can test whether or not it works by firing up a Python session and typing:
 
-    elif(flag == 8):
-        tkinter.messagebox.showinfo("Tic-Tac-Toe", "It is a Tie")
+>>> import cv2
+>>> 
+If you don’t get any errors, you can move on to the next part.
 
-    elif (button1['text'] == 'O' and button2['text'] == 'O' and button3['text'] == 'O' or
-          button4['text'] == 'O' and button5['text'] == 'O' and button6['text'] == 'O' or
-          button7['text'] == 'O' and button8['text'] == 'O' and button9['text'] == 'O' or
-          button1['text'] == 'O' and button5['text'] == 'O' and button9['text'] == 'O' or
-          button3['text'] == 'O' and button5['text'] == 'O' and button7['text'] == 'O' or
-          button1['text'] == 'O' and button2['text'] == 'O' and button3['text'] == 'O' or
-          button1['text'] == 'O' and button4['text'] == 'O' and button7['text'] == 'O' or
-          button2['text'] == 'O' and button5['text'] == 'O' and button8['text'] == 'O' or
-          button7['text'] == 'O' and button6['text'] == 'O' and button9['text'] == 'O'):
-        disableButton()
-        tkinter.messagebox.showinfo("Tic-Tac-Toe", "playerb won")
-       
+Understanding the Code
+Let’s break down the actual code, which you can download from the repo. Grab the face_detect.py script, the abba.png pic, and the haarcascade_frontalface_default.xml.
 
-buttons = StringVar()
+# Get user supplied values
+imagePath = sys.argv[1]
+cascPath = sys.argv[2]
+You first pass in the image and cascade names as command-line arguments. We’ll use the ABBA image as well as the default cascade for detecting faces provided by OpenCV.
 
-label = Label( tk, text="Player 1:", font='Times 20 bold', bg='white', fg='black', height=1, width=8)
-label.grid(row=1, column=0)
+# Create the haar cascade
+faceCascade = cv2.CascadeClassifier(cascPath)
+Now we create the cascade and initialize it with our face cascade. This loads the face cascade into memory so it’s ready for use. Remember, the cascade is just an XML file that contains the data to detect faces.
 
+# Read the image
+image = cv2.imread(imagePath)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+Here we read the image and convert it to grayscale. Many operations in OpenCV are done in grayscale.
 
-label = Label( tk, text="Player 2:", font='Times 20 bold', bg='white', fg='black', height=1, width=8)
-label.grid(row=2, column=0)
+# Detect faces in the image
+faces = faceCascade.detectMultiScale(
+    gray,
+    scaleFactor=1.1,
+    minNeighbors=5,
+    minSize=(30, 30),
+    flags = cv2.cv.CV_HAAR_SCALE_IMAGE
+)
+This function detects the actual face and is the key part of our code, so let’s go over the options:
 
-button1 = Button(tk, text=" ", font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button1))
-button1.grid(row=3, column=0)
+The detectMultiScale function is a general function that detects objects. Since we are calling it on the face cascade, that’s what it detects.
 
-button2 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button2))
-button2.grid(row=3, column=1)
+The first option is the grayscale image.
 
-button3 = Button(tk, text=' ',font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button3))
-button3.grid(row=3, column=2)
+The second is the scaleFactor. Since some faces may be closer to the camera, they would appear bigger than the faces in the back. The scale factor compensates for this.
 
-button4 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button4))
-button4.grid(row=4, column=0)
+The detection algorithm uses a moving window to detect objects. minNeighbors defines how many objects are detected near the current one before it declares the face found. minSize, meanwhile, gives the size of each window.
 
-button5 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button5))
-button5.grid(row=4, column=1)
+Note: I took commonly used values for these fields. In real life, you would experiment with different values for the window size, scale factor, and so on until you found one that works best for you.
 
-button6 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button6))
-button6.grid(row=4, column=2)
+The function returns a list of rectangles in which it believes it found a face. Next, we will loop over where it thinks it found something.
 
-button7 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button7))
-button7.grid(row=5, column=0)
+print "Found {0} faces!".format(len(faces))
 
-button8 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='white', height=4, width=8, command=lambda: btnClick(button8))
-button8.grid(row=5, column=1)
+# Draw a rectangle around the faces
+for (x, y, w, h) in faces:
+    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+This function returns 4 values: the x and y location of the rectangle, and the rectangle’s width and height (w , h).
 
-button9 = Button(tk, text=' ', font='Times 20 bold', bg='red', fg='black', height=4 , width=8, command=lambda: btnClick(button9))
-button9.grid(row=5, column=2) 
+We use these values to draw a rectangle using the built-in rectangle() function.
 
-tk.mainloop()
+cv2.imshow("Faces found", image)
+cv2.waitKey(0)
+In the end, we display the image and wait for the user to press a key.
+
